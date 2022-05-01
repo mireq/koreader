@@ -228,6 +228,11 @@ function Kindle:intoScreenSaver()
         if self:supportsScreensaver() then
             -- NOTE: Meaning this is not a SO device ;)
             local Screensaver = require("ui/screensaver")
+
+            if os.getenv("STOP_FRAMEWORK") == "yes" then
+                self.powerd:turnOffFrontlight()
+            end
+
             Screensaver:setup()
             Screensaver:show()
         else
@@ -251,6 +256,10 @@ function Kindle:outofScreenSaver()
             -- And redraw everything in case the framework managed to screw us over...
             local UIManager = require("ui/uimanager")
             UIManager:nextTick(function() UIManager:setDirty("all", "full") end)
+
+            if os.getenv("STOP_FRAMEWORK") == "yes" then
+                self.powerd:turnOnFrontlight()
+            end
         else
             -- Stop awesome again if need be...
             if os.getenv("AWESOME_STOPPED") == "yes" then
@@ -599,10 +608,21 @@ function KindlePaperWhite2:init()
         is_charging_file = "/sys/devices/system/wario_charger/wario_charger0/charging",
     }
 
+    if os.getenv("STOP_FRAMEWORK") == "yes" then
+        self.input = require("device/input"):new{
+            device = self,
+            event_map = {
+                [116] = "Power",
+            },
+        }
+    end
     Kindle.init(self)
 
     self.input.open(self.touch_dev)
     self.input.open("fake_events")
+    if os.getenv("STOP_FRAMEWORK") == "yes" then
+        self.input.open("/dev/input/event0")
+    end
 end
 
 function KindleBasic:init()

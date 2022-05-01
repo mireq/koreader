@@ -244,6 +244,28 @@ function UIManager:init()
             Device:usbPlugOut()
             self:_afterNotCharging()
         end
+        if os.getenv("STOP_FRAMEWORK") == "yes" then
+            self.event_handlers["PowerRelease"] = function()
+                if not self._entered_poweroff_stage then
+                    UIManager:unschedule(self.poweroff_action)
+                    -- resume if we were suspended
+                    if Device.screen_saver_mode then
+                        Device:resume()
+                        Device:outofScreenSaver()
+                        self:_afterResume()
+                    else
+                        self:_beforeSuspend()
+                        Device:intoScreenSaver()
+                        Device:suspend()
+                    end
+                end
+            end
+            self.event_handlers["__default__"] = function(input_event)
+                if not Device.screen_saver_mode then
+                    self:sendEvent(input_event)
+                end
+            end
+        end
     elseif Device:isRemarkable() then
         self.event_handlers["Suspend"] = function()
             self:_beforeSuspend()
@@ -1809,7 +1831,11 @@ function UIManager:suspend()
     if Device:isCervantes() or Device:isKobo() or Device:isSDL() or Device:isRemarkable() or Device:isSonyPRSTUX() then
         self.event_handlers["Suspend"]()
     elseif Device:isKindle() then
-        Device.powerd:toggleSuspend()
+        if os.getenv("STOP_FRAMEWORK") == "yes" then
+            self.event_handlers["PowerRelease"]()
+        else
+            Device.powerd:toggleSuspend()
+        end
     elseif Device.isPocketBook() and Device.canSuspend() then
         Device:suspend()
     end
