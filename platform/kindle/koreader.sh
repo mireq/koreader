@@ -80,19 +80,19 @@ fi
 # By default, don't stop the framework.
 if [ "${1}" = "--framework_stop" ]; then
     shift 1
-    STOP_FRAMEWORK="yes"
+    export STOP_FRAMEWORK="yes"
     NO_SLEEP="no"
     REEXEC_FLAGS="${REEXEC_FLAGS} --framework_stop"
 elif [ "${1}" = "--asap" ]; then
     # Start as soon as possible, without sleeping to workaround UI quirks
     shift 1
     NO_SLEEP="yes"
-    STOP_FRAMEWORK="no"
+    export STOP_FRAMEWORK="no"
     REEXEC_FLAGS="${REEXEC_FLAGS} --asap"
     # Don't sleep during eips calls either...
     export EIPS_NO_SLEEP="true"
 else
-    STOP_FRAMEWORK="no"
+    export STOP_FRAMEWORK="no"
     NO_SLEEP="no"
 fi
 
