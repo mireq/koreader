@@ -24,7 +24,7 @@ end
 -- If we start with the light off (fl_intensity is fl_min), ensure a toggle will set it to the lowest "on" step,
 -- and that we update fl_intensity (by using setIntensity and not setIntensityHW).
 function KindlePowerD:turnOnFrontlightHW()
-    self:setIntensity(self.fl_intensity == self.fl_min and self.fl_min + 1 or self.fl_intensity)
+    self:setIntensityHW(self.fl_intensity == self.fl_min and self.fl_min + 1 or self.fl_intensity)
 end
 -- Which means we need to get rid of the insane fl_intensity == fl_min shortcut in turnOnFrontlight, too...
 -- That dates back to #2941, and I have no idea what it's supposed to help with.
