@@ -220,6 +220,8 @@ if [ "${STOP_FRAMEWORK}" = "yes" ]; then
         # And remove the trap like a ninja now!
         trap - TERM
     fi
+    # Unload screensaver module
+    lipc-set-prop com.lab126.blanket unload screensaver
 fi
 
 # Normalize a version string for easy numeric comparisons
@@ -355,6 +357,8 @@ fi
 # Restart framework (if need be)
 if [ "${STOP_FRAMEWORK}" = "yes" ]; then
     logmsg "Restarting framework . . ."
+    # Load screensaver module
+    lipc-set-prop com.lab126.blanket load screensaver
     if [ "${INIT_TYPE}" = "sysv" ]; then
         cd / && env -u LD_LIBRARY_PATH /etc/init.d/framework start
     else
